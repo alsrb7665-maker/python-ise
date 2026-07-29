@@ -12,21 +12,21 @@ if file_path.exists():  # 파일이 존재할 경우
     with file_path.open('r', encoding='utf-8') as file:
         data = json.load(file)  # JSON 파일을 파이썬 딕셔너리로 변환하는 코드
 
-    # 3. 고객 리뷰 순위 리스트 생성
-    # 'item' 리스트의 각 항목을 순회하며 'customerReviewRank' 값을 추출하여 리스트에 추가합니다.
-    customer_review_ranks = []  # 고객 리뷰 순위를 저장할 빈 리스트
+    # 3. 도서 별 작가 딕셔너리 생성
+    # 'item' 리스트의 각 항목에서 책 제목과 작가 이름을 추출하여 딕셔너리에 저장합니다.
+    book_authors = {}  # 도서 제목과 작가를 저장할 빈 딕셔너리
     for item in data['item']:  # 'item' 리스트의 각 항목을 순회
-        customer_review_ranks.append(item['customerReviewRank'])  # 'customerReviewRank' 값을 가져와서 리스트에 추가하는 코드
+        title = item['title']
+        author = item['author']
+        book_authors[title] = author  # 책 제목과 작가를 딕셔너리에 추가하는 코드
 
-    # 4. 평균 고객 리뷰 순위 계산
-    # 고객 리뷰 순위 리스트의 평균을 계산합니다.
-    average_review_rank = sum(customer_review_ranks) / len(customer_review_ranks)  # 평균 리뷰 순위를 계산하는 코드
-
-    # 5. 결과 출력
-    # 계산된 평균 고객 리뷰 순위를 출력합니다.
-    print(f"도서의 평균 고객 리뷰 순위: {average_review_rank:.2f}")
-
+    # 4. 결과 출력
+    # 도서 제목과 작가를 출력합니다.
+    print("도서 별 작가 리스트:")
+    for title, author in book_authors.items():  # 딕셔너리의 각 항목 순회
+        print(f"제목: {title}\n작가: {author}") # 제목과 작가를 출력하는 코드
+        print("-----------------------------------------------------------------")
 else:
-    # 6. 파일이 없을 경우 처리
+    # 5. 파일이 없을 경우 처리
     # 파일이 존재하지 않으면 오류 메시지를 출력합니다.
     print(f"파일이 존재하지 않습니다: {file_path}")  # 파일이 존재하지 않을 때 처리 코드
