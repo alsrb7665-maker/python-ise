@@ -1,0 +1,164 @@
+SSAFY 관통프로젝트 정리
+이번 관통프로젝트는 둘이서 같이 진행했고, 각자 느낀 부분을 나눠서 정리했다.
+
+1. Git으로 같이 작업한 것 (담당: 김세훈)
+우리 둘 다 깃 협업은 거의 처음이라, 그냥 각자 코드 짜서 파일 주고받는 거 아니고
+브랜치 나눠서 작업해보는 걸 목표로 했다.
+
+브랜치는 이렇게 나눴다.
+
+developer1 ─────┐
+                │
+                ┼──> develop ──> master
+                │
+developer2 ─────┘
+master에는 절대 바로 작업 안 하기로 약속했다. 각자 developer1, developer2 브랜치
+따서 거기서만 코드 짜고, 나중에 합칠 때만 master로 올리는 식.
+
+흐름은 대충 이랬다.
+
+내가 먼저 저장소 만들고 developer1 브랜치 파서 작업함
+``'bash
+git checkout -b developer1
+git add .
+git commit -m "developer1 작업"
+git push origin +developer1
+
+
+2. 팀원이 저장소 clone 받고 developer2 브랜치 새로 파서 작업 시작
+```bash
+git clone https://github.com/changsangho/teamPjt.git
+cd teamPjt
+git checkout -b developer2
+나는 또 코드 고치고 push
+팀원은 자기 작업 커밋해두고, 내 변경사항은 fetch로 받아온 다음 git log로 내가 뭘 고쳤는지 먼저 확인하고 나서 merge 진행
+git fetch origin
+git switch developer1
+git log
+git switch developer2
+git merge origin/developer1
+이때 이력이 안 맞아서 merge가 그냥은 안 됐는데 --allow-unrelated-histories 옵션 붙이니까 강제로 됐다. 이게 왜 필요한지 처음엔 몰랐는데, clone 받은 시점이랑 브랜치 만든 시점이 어긋나서 그런 거였음.
+충돌 난 부분은 VS Code에서 "Accept Both Changes" 눌러서 둘 코드 다 살리고 다시 add, commit, push
+솔직히 힘들었던 부분은 merge 충돌 처음 봤을 때였다. 화면에 <<<<<<<
+이런 게 뜨니까 뭘 지워야 하는지 몰라서 잠깐 멘붕이었는데, VS Code가 버튼으로
+"이거 쓸래 저거 쓸래 둘다 쓸래" 골라주는 거 알고 나서는 훨씬 편해졌다.
+
+배운 점은 checkout -b는 브랜치를 새로 만들 때, switch는 있는 브랜치로
+갈아탈 때 쓰는 거라는 거 확실히 구분하게 됐고, master 안 건드리고 개인 브랜치에서만
+작업하는 이유도 이제 알겠다. 안 그러면 검증도 안 된 코드가 바로 메인에 들어가서
+문제 생길 수 있으니까.
+
+2. 파이썬 문제 풀이 (담당: 김민규)
+주어진 스켈레톤 코드(problem_A1.py ~ problem_A5.py)에 빈칸(pass)으로
+남아있는 부분을 요구사항 명세서 보고 채워 넣는 방식으로 했다. 5개 다
+books_20.json 파일 열어서 item 리스트 순회하는 구조는 똑같고, 안에서
+뭘 뽑아내느냐만 달랐다.
+
+F101 책 제목 리스트: item마다 title만 뽑아서 리스트에 담고 출력. 제일 기본적인 문제라 여기서 패턴 익히고 나머지는 그거 응용하는 식으로 풀었다.
+F102 도서 평균 가격: priceSales 값들 리스트에 모아서 sum() / len()으로 평균 냄. 출력할 때 :.2f로 소수점 두 자리까지 맞추고 "원" 붙이는 거 신경 씀.
+F103 평균 고객 리뷰 순위: 구조는 F102랑 완전 똑같고 customerReviewRank만 뽑는 거라 이건 좀 복사해서 필드명만 바꾸면 됐다.
+F104 도서별 작가 리스트**: 여기부터는 리스트가 아니라 딕셔너리 써야 됐다. 제목을 key로, 작가를 value로 넣어서 {title: author} 형태로 만듦. 왜 리스트 대신 딕셔너리인지 처음엔 감이 안 왔는데, 제목이랑 작가가 1:1로 짝지어져야 하니까 딕셔너리가 맞다는 걸 나중에 이해했다.
+F106 정가 범위 분류: 이건 힌트 주석이 따로 없어서 직접 조건을 짜야 했다. priceStandard 값 보고 1만원 미만/1만원~2반만원/2만원 이상으로 나눠서 각 구간에 해당하는 책 제목을 딕셔너리 안에 리스트로 쌓는 식으로 짰다. 결과 예시 이미지 보면서 "이게 몇 만원 기준으로 나뉜 거지?" 하고 거꾸로 유추해야 해서 다른 문제보다 시간이 좀 더 걸렸다.
+어려웠던 부분은 파일 경로였다. 문제마다 books_20.json 쓰는지
+books_500.json 쓰는지 달라서, 스켈레톤 복붙하다가 경로 안 바꾸고 그대로
+돌려서 파일 없다고 에러 뜨는 걸 몇 번 겪었다. 이제는 문제 풀기 전에 요구사항
+문서에서 파일명부터 확인하는 습관이 생겼다.
+
+새로 배운 것들 정리하면
+
+Path(...).exists()로 파일 있는지 먼저 확인하고 여는 패턴
+with open(...) as file: 이랑 json.load() 같이 써서 JSON 읽는 흐름
+그냥 값 모을 땐 리스트, 뭐랑 뭐를 짝지어야 할 땐 딕셔너리 쓰는 감
+dict.get(key, 0) + 1 로 개수 세는 딕셔너리 만드는 방법
+
+3. 느낀 점
+
+김세훈: 나는 사실 깃을 처음 써봐서 그런지 코드보다 이게 더 어려웠다. 브랜치
+따고 merge하고 이런 게 말로 들을 땐 쉬워 보였는데 막상 충돌 나니까 뭘 눌러야
+할지 몰라서 좀 당황했다. 근데 한 번 해보고 나니까 왜 다들 브랜치 나눠서 하라고
+하는지 이해가 됐다. 나중에 회사 가서도 이런 식으로 일하려나 싶기도 하고, 아무튼
+협업 과정 자체를 경험해본 게 제일 남는 것 같다.
+
+김민규: 나는 파이썬 문제 푸는 쪽을 맡았는데 처음 몇 개는 그냥 주석 보고
+따라 치면 돼서 쉬웠다. 근데 F106처럼 조건을 직접 짜야 하는 문제 나오니까 갑자기
+막막했다. 결과 예시 보면서 "아 이게 이런 조건이었구나" 하고 거꾸로 알아내야
+했는데, 그러면서 리스트 쓸지 딕셔너리 쓸지 미리 생각 안 하고 코드부터 짜면
+계속 고쳐야 한다는 걸 느꼈다. 다음엔 짜기 전에 뭘 써야 할지 좀 더 생각하고
+시작해야겠다.
+
+```
+
+
+
+
+
+
+
+---
+
+
+
+
+
+## problem_A1 
+
+![image1](./skeleton/image%20file/problem_A1.png)
+
+
+## problem_A1 실행화면
+
+![image2](./skeleton/image%20file/problem_A1%20실행화면.png)ㄴㅁ
+
+## problem_A1 실행화면2
+
+![image3](./skeleton/image%20file/problem_A1%20실행화면2.png)
+
+
+## probelm_A2 
+
+![image4](./skeleton/image%20file/problem_A2.png)
+
+## probelm_A2 실행화면
+
+![image5](./skeleton/image%20file/problem_A3%20실행화면.png)
+
+## probelm_A2 실행화면2
+
+![image6](./skeleton/image%20file/problem_A2%20실행화면2.png)
+
+## probelm_A3
+
+![image7](./skeleton/image%20file/problem_A3.png)
+
+## probelm_A3 실행화면
+
+![image8](./skeleton/image%20file/problem_A3%20실행화면.png)
+
+## probelm_A3 실행화면2
+
+![image9](./skeleton/image%20file/problem_A3%20실행화면2.png)
+
+## probelm_A4
+
+![image10](./skeleton/image%20file/problem_A4.png)
+
+## probelm_A4 실행화면
+
+![image11](./skeleton/image%20file/problem_A4%20실행화면.png)
+
+## probelm_A4 실행화면2
+
+![image12](./skeleton/image%20file/problem_A4%20실행화면%202.png)
+
+## probelm_A5
+
+![image13](./skeleton/image%20file/problem_A5.png)
+
+## probelm_A5 실행화면
+
+![image14](./skeleton/image%20file/problem_A5%20실행화면.png)
+
+
+## probelm_A5 실행화면2
+
+![image15](./skeleton/image%20file/problem_A5%20실행화면2.png)
